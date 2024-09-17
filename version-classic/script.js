@@ -72,7 +72,7 @@ function handleStartButtonClick(e) {
     initializeAudio().then(() => {
       resetGame();
       gameOver = false;
-      generateNextMove();
+      introAnimation(); // Added intro animation on start
     });
   }
 }
@@ -158,11 +158,10 @@ function checkPlayerSolution() {
 function playFailSequence() {
   solutionPlaying = true;
   playSound('fail');
-  flashButtons();
-  setTimeout(() => {
+  flashButtons(3, 500, () => {
     resetGame();
     solutionPlaying = false;
-  }, 2000);
+  });
 }
 
 // Update the scoreboard text on the page
@@ -170,10 +169,30 @@ function updateScore() {
   SCORE_DISPLAY.innerHTML = score < 10 ? '0' + score : score;
 }
 
-// Flash all buttons
-function flashButtons() {
-  BUTTON_ELEMENTS.forEach(button => {
-    button.classList.add('press');
-    setTimeout(() => button.classList.remove('press'), 300);
+// Intro animation (flash the board 3 times)
+function introAnimation() {
+  solutionPlaying = true;
+  flashButtons(3, 500, () => {
+    solutionPlaying = false;
+    generateNextMove(); // Start the game after the intro animation
   });
+}
+
+// Flash all buttons a specified number of times
+function flashButtons(times, intervalTime, callback) {
+  let flashes = 0;
+  const interval = setInterval(() => {
+    BUTTON_ELEMENTS.forEach(button => {
+      button.classList.add('press');
+      playSound(button.dataset.color); // Play sound for each button
+      setTimeout(() => {
+        button.classList.remove('press');
+      }, 300);
+    });
+    flashes++;
+    if (flashes >= times) {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, intervalTime);
 }
