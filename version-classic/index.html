@@ -16,27 +16,33 @@
     </div>
   </header>
 
-    <!-- Controls Section -->
-    <section class="controls">
-      <a class="btn" id="startgame" href="#"><i class="fa fa-play-circle-o" aria-hidden="true"></i> Start</a>
-      <span class="score">00</span>
-      <a class="btn" id="resetgame" href="#"><i class="fa fa-refresh" aria-hidden="true"></i> Reset</a>
-    </section>
+  <!-- Controls Section -->
+  <section class="controls">
+    <a class="btn" id="startgame" href="#"><i class="fa fa-play-circle-o" aria-hidden="true"></i> Start</a>
+    <span class="score">00</span>
+    <a class="btn" id="resetgame" href="#"><i class="fa fa-refresh" aria-hidden="true"></i> Reset</a>
+  </section>
 
-    <!-- Game Buttons -->
-    <section class="buttons">
-      <div class="top">
-        <div class="button red" data-color="red" data-id="1" data-sound="sounds/red.mp3"></div>
-        <div class="button green" data-color="green" data-id="2" data-sound="sounds/green.mp3"></div>
-      </div>
-      <div class="message">Simon</div>
-      <div class="bottom">
-        <div class="button yellow" data-color="yellow" data-id="4" data-sound="sounds/yellow.mp3"></div>
-        <div class="button blue" data-color="blue" data-id="3" data-sound="sounds/blue.mp3"></div>
-      </div>
-    </section>
-  </main>
-  
+  <!-- Game Buttons -->
+  <section class="buttons">
+    <div class="top">
+      <div class="button red" data-color="red" data-id="1"></div>
+      <div class="button green" data-color="green" data-id="2"></div>
+    </div>
+    <div class="message">Simon</div>
+    <div class="bottom">
+      <div class="button yellow" data-color="yellow" data-id="4"></div>
+      <div class="button blue" data-color="blue" data-id="3"></div>
+    </div>
+  </section>
+
+  <!-- Preload Audio -->
+  <audio id="sound-red" src="sounds/red.mp3"></audio>
+  <audio id="sound-green" src="sounds/green.mp3"></audio>
+  <audio id="sound-blue" src="sounds/blue.mp3"></audio>
+  <audio id="sound-yellow" src="sounds/yellow.mp3"></audio>
+  <audio id="sound-fail" src="sounds/fail.mp3"></audio>
+
   <!-- Script -->
   <script src="script.js"></script>
 </body>

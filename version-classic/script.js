@@ -9,8 +9,14 @@ const RESET_BUTTON = document.getElementById('resetgame');
 const BANNER = document.querySelector('.message');
 const SCORE_DISPLAY = document.querySelector('.score');
 
+const SOUND_RED = document.getElementById('sound-red');
+const SOUND_GREEN = document.getElementById('sound-green');
+const SOUND_BLUE = document.getElementById('sound-blue');
+const SOUND_YELLOW = document.getElementById('sound-yellow');
+const SOUND_FAIL = document.getElementById('sound-fail');
+
 const BUTTON_ELEMENTS = [RED_BUTTON, GREEN_BUTTON, BLUE_BUTTON, YELLOW_BUTTON];
-const SOUND_FAIL = 'sounds/fail.mp3';
+const SOUNDS = [SOUND_RED, SOUND_GREEN, SOUND_BLUE, SOUND_YELLOW];
 
 let solution = [];
 let playerSolution = [];
@@ -42,6 +48,16 @@ function handleButtonClick(e) {
 function handleStartButtonClick(e) {
   e.preventDefault();
   if (gameOver) {
+    // Initialize audio on user interaction for iOS
+    SOUNDS.forEach(sound => {
+      sound.play();
+      sound.pause();
+      sound.currentTime = 0;
+    });
+    SOUND_FAIL.play();
+    SOUND_FAIL.pause();
+    SOUND_FAIL.currentTime = 0;
+
     resetGame();
     gameOver = false;
     generateNextMove();
@@ -70,17 +86,24 @@ function resetGame() {
 // Animate button press and play sound
 function playMove(button) {
   button.classList.add('press');
-  new Audio(button.dataset.sound).play();
+  playSound(button.dataset.color);
   setTimeout(() => {
     button.classList.remove('press');
   }, 300);
 }
 
+// Play sound based on color
+function playSound(color) {
+  const soundElement = document.getElementById(`sound-${color}`);
+  soundElement.currentTime = 0;
+  soundElement.play();
+}
+
 // Generate next move in the solution
 function generateNextMove() {
   BANNER.innerHTML = 'Simon';
-  solution.push(Math.floor((Math.random() * 4) + 1));
-  timeout -= 25;
+  solution.push(Math.floor(Math.random() * 4) + 1);
+  timeout = Math.max(300, timeout - 25);
   animateSolution();
 }
 
@@ -89,7 +112,8 @@ function animateSolution() {
   let index = 0;
   solutionPlaying = true;
   const interval = setInterval(() => {
-    playMove(BUTTON_ELEMENTS[solution[index] - 1]);
+    const button = BUTTON_ELEMENTS[solution[index] - 1];
+    playMove(button);
     index++;
     if (index >= solution.length) {
       clearInterval(interval);
@@ -100,47 +124,34 @@ function animateSolution() {
 
 // Check the player's solution against the game-generated solution
 function checkPlayerSolution() {
-  let failed = false;
-  solutionPlaying = true;
-
-  for (let i = 0; i < playerSolution.length; i++) {
-    if (playerSolution[i] !== solution[i]) {
-      failed = true;
-      BANNER.innerHTML = 'Sorry!';
-      setTimeout(() => new Audio(SOUND_FAIL).play(), 700);
-      setTimeout(introAnimation, 500);
-      setTimeout(checkHighScore, 3000);
-      setTimeout(resetGame, 3000);
-      break;
-    }
-  }
-
-  if (!failed && playerSolution.length === solution.length) {
-    if (arraysEqual(playerSolution, solution)) {
-      score++;
-      updateScore();
-      BANNER.innerHTML = 'Good!';
-      setTimeout(generateNextMove, 1000);
-    }
+  const currentMoveIndex = playerSolution.length - 1;
+  if (playerSolution[currentMoveIndex] !== solution[currentMoveIndex]) {
+    BANNER.innerHTML = 'Sorry!';
+    playFailSequence();
+  } else if (playerSolution.length === solution.length) {
+    score++;
+    updateScore();
+    BANNER.innerHTML = 'Good!';
     playerSolution = [];
+    setTimeout(generateNextMove, 1000);
   }
+}
 
-  solutionPlaying = false;
+// Play fail sequence
+function playFailSequence() {
+  solutionPlaying = true;
+  SOUND_FAIL.currentTime = 0;
+  SOUND_FAIL.play();
+  flashButtons();
+  setTimeout(() => {
+    resetGame();
+    solutionPlaying = false;
+  }, 2000);
 }
 
 // Update the scoreboard text on the page
 function updateScore() {
   SCORE_DISPLAY.innerHTML = score < 10 ? '0' + score : score;
-}
-
-// Intro animation (flash the board 3 times)
-function introAnimation() {
-  let flashes = 0;
-  const flashInterval = setInterval(() => {
-    flashButtons();
-    flashes++;
-    if (flashes >= 3) clearInterval(flashInterval);
-  }, 500);
 }
 
 // Flash all buttons
@@ -150,20 +161,3 @@ function flashButtons() {
     setTimeout(() => button.classList.remove('press'), 300);
   });
 }
-
-// Check for a new high score
-function checkHighScore() {
-  // Assuming topScores is an array of high score objects sorted in descending order
-  if (score > topScores[0].score) {
-    const newName = window.prompt('You earned a new high score! Enter your name for the leaderboard:');
-    firebase.database().ref('HighScores/1').set({ name: newName, score });
-  }
-}
-
-// Compare two arrays
-function arraysEqual(a, b) {
-  return JSON.stringify(a) === JSON.stringify(b);
-}
-
-// Run intro animation
-introAnimation();
