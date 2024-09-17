@@ -9,14 +9,7 @@ const RESET_BUTTON = document.getElementById('resetgame');
 const BANNER = document.querySelector('.message');
 const SCORE_DISPLAY = document.querySelector('.score');
 
-const SOUND_RED = document.getElementById('sound-red');
-const SOUND_GREEN = document.getElementById('sound-green');
-const SOUND_BLUE = document.getElementById('sound-blue');
-const SOUND_YELLOW = document.getElementById('sound-yellow');
-const SOUND_FAIL = document.getElementById('sound-fail');
-
 const BUTTON_ELEMENTS = [RED_BUTTON, GREEN_BUTTON, BLUE_BUTTON, YELLOW_BUTTON];
-const SOUNDS = [SOUND_RED, SOUND_GREEN, SOUND_BLUE, SOUND_YELLOW];
 
 let solution = [];
 let playerSolution = [];
@@ -25,8 +18,36 @@ let gameOver = true;
 let solutionPlaying = false;
 let timeout = 650;
 
+// Audio context and buffers
+let audioContext;
+let soundBuffers = {};
+
 // Initialize event listeners
 initializeEventListeners();
+
+// Load sounds using Web Audio API
+function initializeAudio() {
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const soundFiles = {
+    red: 'sounds/red.mp3',
+    green: 'sounds/green.mp3',
+    blue: 'sounds/blue.mp3',
+    yellow: 'sounds/yellow.mp3',
+    fail: 'sounds/fail.mp3',
+  };
+  const promises = [];
+  for (const [color, url] of Object.entries(soundFiles)) {
+    promises.push(
+      fetch(url)
+        .then(response => response.arrayBuffer())
+        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => {
+          soundBuffers[color] = audioBuffer;
+        })
+    );
+  }
+  return Promise.all(promises);
+}
 
 // Event listeners for game buttons
 function initializeEventListeners() {
@@ -48,19 +69,11 @@ function handleButtonClick(e) {
 function handleStartButtonClick(e) {
   e.preventDefault();
   if (gameOver) {
-    // Initialize audio on user interaction for iOS
-    SOUNDS.forEach(sound => {
-      sound.play();
-      sound.pause();
-      sound.currentTime = 0;
+    initializeAudio().then(() => {
+      resetGame();
+      gameOver = false;
+      generateNextMove();
     });
-    SOUND_FAIL.play();
-    SOUND_FAIL.pause();
-    SOUND_FAIL.currentTime = 0;
-
-    resetGame();
-    gameOver = false;
-    generateNextMove();
   }
 }
 
@@ -92,11 +105,15 @@ function playMove(button) {
   }, 300);
 }
 
-// Play sound based on color
+// Play sound using AudioContext
 function playSound(color) {
-  const soundElement = document.getElementById(`sound-${color}`);
-  soundElement.currentTime = 0;
-  soundElement.play();
+  const buffer = soundBuffers[color];
+  if (buffer) {
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    source.start(0);
+  }
 }
 
 // Generate next move in the solution
@@ -140,8 +157,7 @@ function checkPlayerSolution() {
 // Play fail sequence
 function playFailSequence() {
   solutionPlaying = true;
-  SOUND_FAIL.currentTime = 0;
-  SOUND_FAIL.play();
+  playSound('fail');
   flashButtons();
   setTimeout(() => {
     resetGame();
