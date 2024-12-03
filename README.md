@@ -24,4 +24,22 @@ Dive into an exciting game full of light and sound with Simon Classic! Simon, th
 
 ---
 
+## Versions & Test Links
+
+The repository includes three versions of the Simon Memory Game for testing and exploration:
+
+1. **AI Version**  
+   - GitHub Source Code: [AI Version](https://github.com/DaddioTime/SimonMemoryGame/tree/main/version-ai)  
+   - Test URL: [AI Version Demo](https://daddiotime-simonmemorygame.netlify.app/version-ai/index.html)  
+
+2. **Retro Version**  
+   - GitHub Source Code: [Retro Version](https://github.com/DaddioTime/SimonMemoryGame/tree/main/version-retro)  
+   - Test URL: [Retro Version Demo](https://daddiotime-simonmemorygame.netlify.app/version-retro/index.html)  
+
+3. **Classic Version**  
+   - GitHub Source Code: [Classic Version](https://github.com/DaddioTime/SimonMemoryGame/tree/main/version-classic)  
+   - Test URL: [Classic Version Demo](https://daddiotime-simonmemorygame.netlify.app/version-classic/index.html)  
+
+---
+
 This repository contains the source code and resources for the classic Simon game app, ready for implementation and modification. Have fun playing and developing!
