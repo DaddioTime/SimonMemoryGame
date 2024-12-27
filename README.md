@@ -4,6 +4,8 @@
 
 Dive into an exciting game full of light and sound with Simon Classic! Simon, the ultimate challenger, tests your skills with each color sequence. Are you ready?
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/50b1cd17-653a-44fa-b07b-12bf9cdd8b1d/deploy-status)](https://app.netlify.com/sites/daddiotime-simonmemorygame/deploys)
+
 ## Features
 
 - **Repeat Patterns**: An electronic game with lights and sounds that challenges your observation and memory skills.
